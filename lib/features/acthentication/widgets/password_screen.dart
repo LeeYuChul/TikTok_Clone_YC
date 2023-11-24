@@ -4,35 +4,35 @@ import 'package:tiktok_clone/constants/sizes.dart';
 import 'package:tiktok_clone/features/acthentication/widgets/form_button.dart';
 import 'package:tiktok_clone/features/acthentication/widgets/password_screen.dart';
 
-class EmailScreen extends StatefulWidget {
-  const EmailScreen({super.key});
+class PasswordScreen extends StatefulWidget {
+  const PasswordScreen({super.key});
 
   @override
-  State<EmailScreen> createState() => _emailScreenState();
+  State<PasswordScreen> createState() => _PasswordScreenState();
 }
 
-class _emailScreenState extends State<EmailScreen> {
-  final TextEditingController _emailController = TextEditingController();
+class _PasswordScreenState extends State<PasswordScreen> {
+  final TextEditingController _passwordController = TextEditingController();
 
   String _email = "";
 
   @override
   void initState() {
     super.initState();
-    _emailController.addListener(() {
+    _passwordController.addListener(() {
       setState(() {
-        _email = _emailController.text;
+        _email = _passwordController.text;
       });
     });
   }
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
-  String? _isEmailValid() {
+  String? _isPasswordValid() {
     if (_email.isEmpty) return null;
     final regExp = RegExp(
         r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+"); // d
@@ -47,7 +47,7 @@ class _emailScreenState extends State<EmailScreen> {
   }
 
   void _onSubmit() {
-    if (_email.isEmpty || _isEmailValid() != null) return;
+    if (_email.isEmpty || _isPasswordValid() != null) return;
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -78,7 +78,7 @@ class _emailScreenState extends State<EmailScreen> {
             children: [
               Gaps.v40,
               const Text(
-                "What is your email?",
+                "Password",
                 style: TextStyle(
                   fontSize: Sizes.size24,
                   fontWeight: FontWeight.w700,
@@ -86,14 +86,15 @@ class _emailScreenState extends State<EmailScreen> {
               ),
               Gaps.v16,
               TextField(
-                keyboardType: TextInputType.emailAddress,
                 onEditingComplete: _onSubmit,
-                controller: _emailController,
+                controller: _passwordController,
                 autocorrect: false,
                 cursorColor: Theme.of(context).primaryColor,
                 decoration: InputDecoration(
-                  errorText: _isEmailValid(),
-                  hintText: "email",
+                  prefixIcon: const Icon(Icons.ac_unit_outlined),
+                  suffixIcon: const Icon(Icons.app_blocking_rounded),
+                  errorText: _isPasswordValid(),
+                  hintText: "Make it Strong",
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(
                       color: Colors.grey.shade400,
@@ -110,7 +111,7 @@ class _emailScreenState extends State<EmailScreen> {
               GestureDetector(
                 onTap: _onSubmit,
                 child: FormButton(
-                  disabled: _email.isEmpty || _isEmailValid() != null,
+                  disabled: _email.isEmpty || _isPasswordValid() != null,
                 ),
               )
             ],

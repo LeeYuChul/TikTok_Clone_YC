@@ -68,17 +68,6 @@ class SignUpScreen extends StatelessWidget {
                 icon: FaIcon(FontAwesomeIcons.apple),
               ),
               Gaps.v20,
-              FractionallySizedBox(
-                widthFactor: 1,
-                child: Container(
-                  child: Stack(
-                    children: [
-                      const Text("wow"),
-                      SvgPicture.asset('assests/icons/BM.svg')
-                    ],
-                  ),
-                ),
-              )
             ],
           ),
         ),

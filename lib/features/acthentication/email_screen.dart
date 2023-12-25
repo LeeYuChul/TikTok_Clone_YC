@@ -11,6 +11,7 @@ class EmailScreen extends StatefulWidget {
   State<EmailScreen> createState() => _emailScreenState();
 }
 
+// ignore: camel_case_types
 class _emailScreenState extends State<EmailScreen> {
   final TextEditingController _emailController = TextEditingController();
 

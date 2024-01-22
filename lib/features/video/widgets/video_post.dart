@@ -9,6 +9,7 @@ import 'package:visibility_detector/visibility_detector.dart';
 
 class VideoPost extends StatefulWidget {
   final Function onVideoFinished;
+
   final int index;
 
   const VideoPost({
@@ -23,22 +24,13 @@ class VideoPost extends StatefulWidget {
 
 class _VideoPostState extends State<VideoPost>
     with SingleTickerProviderStateMixin {
-  final VideoPlayerController _videoPlayerController =
-      VideoPlayerController.asset("assets/videos/V1.mov");
-  bool _isPaused = false;
-  final _animationDuration = const Duration(milliseconds: 200);
+  late final VideoPlayerController _videoPlayerController;
+
+  final Duration _animationDuration = const Duration(milliseconds: 200);
+
   late final AnimationController _animationController;
 
-  void _onVisibilityChanged(VisibilityInfo info) {
-    if (info.visibleFraction == 1 &&
-        !_isPaused &&
-        !_videoPlayerController.value.isPlaying) {
-      _videoPlayerController.play();
-    }
-    if (_videoPlayerController.value.isPlaying && info.visibleFraction == 0) {
-      _onTogglePause();
-    }
-  } //다른 화면에 있을 때 영상이 재생 안되게 만드는 것 method.
+  bool _isPaused = false;
 
   void _onVideoChange() {
     if (_videoPlayerController.value.isInitialized) {
@@ -50,17 +42,19 @@ class _VideoPostState extends State<VideoPost>
   }
 
   void _initVideoPlayer() async {
+    _videoPlayerController =
+        VideoPlayerController.asset("assets/videos/V1.mov");
     await _videoPlayerController.initialize();
     await _videoPlayerController.setLooping(true);
-    _videoPlayerController.play();
-    setState(() {});
     _videoPlayerController.addListener(_onVideoChange);
+    setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
     _initVideoPlayer();
+
     _animationController = AnimationController(
       vsync: this,
       lowerBound: 1.0,
@@ -68,15 +62,24 @@ class _VideoPostState extends State<VideoPost>
       value: 1.5,
       duration: _animationDuration,
     );
-    _animationController.addListener(() {
-      setState(() {});
-    });
   }
 
   @override
   void dispose() {
     _videoPlayerController.dispose();
     super.dispose();
+  }
+
+  void _onVisibilityChanged(VisibilityInfo info) {
+    if (!mounted) return;
+    if (info.visibleFraction == 1 &&
+        !_isPaused &&
+        !_videoPlayerController.value.isPlaying) {
+      _videoPlayerController.play();
+    }
+    if (_videoPlayerController.value.isPlaying && info.visibleFraction == 0) {
+      _onTogglePause();
+    }
   }
 
   void _onTogglePause() {
@@ -97,10 +100,10 @@ class _VideoPostState extends State<VideoPost>
       _onTogglePause();
     }
     await showModalBottomSheet(
-      backgroundColor: Colors.transparent,
       context: context,
-      builder: (context) => const VideoCommetns(),
       isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const VideoCommetns(),
     );
     _onTogglePause();
   }
@@ -108,8 +111,8 @@ class _VideoPostState extends State<VideoPost>
   @override
   Widget build(BuildContext context) {
     return VisibilityDetector(
-      onVisibilityChanged: _onVisibilityChanged,
       key: Key("${widget.index}"),
+      onVisibilityChanged: _onVisibilityChanged,
       child: Stack(
         children: [
           Positioned.fill(
@@ -127,8 +130,14 @@ class _VideoPostState extends State<VideoPost>
           Positioned.fill(
             child: IgnorePointer(
               child: Center(
-                child: Transform.scale(
-                  scale: _animationController.value,
+                child: AnimatedBuilder(
+                  animation: _animationController,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: _animationController.value,
+                      child: child,
+                    );
+                  },
                   child: AnimatedOpacity(
                     opacity: _isPaused ? 1 : 0,
                     duration: _animationDuration,
@@ -143,62 +152,65 @@ class _VideoPostState extends State<VideoPost>
             ),
           ),
           const Positioned(
-              left: 20,
-              bottom: 20,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '@유처리',
-                    style: TextStyle(
-                      fontSize: Sizes.size16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+            bottom: 20,
+            left: 10,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "@니꼬",
+                  style: TextStyle(
+                    fontSize: Sizes.size20,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
                   ),
-                  Gaps.v24,
-                  Text(
-                    "this is my work station",
-                    style: TextStyle(
-                      fontSize: Sizes.size14,
-                      color: Colors.white,
-                    ),
-                  )
-                ],
-              )),
+                ),
+                Gaps.v10,
+                Text(
+                  "This is my house in Thailand!!!",
+                  style: TextStyle(
+                    fontSize: Sizes.size16,
+                    color: Colors.white,
+                  ),
+                )
+              ],
+            ),
+          ),
           Positioned(
-              right: 10,
-              bottom: 20,
-              child: Column(
-                children: [
-                  const CircleAvatar(
-                    radius: 25,
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                    foregroundImage: NetworkImage(
-                        "https://avatars.githubusercontent.com/u/67686124?v=4"),
-                    child: Text("유철"),
+            bottom: 20,
+            right: 10,
+            child: Column(
+              children: [
+                const CircleAvatar(
+                  radius: 25,
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
+                  foregroundImage: NetworkImage(
+                    "https://avatars.githubusercontent.com/u/3612017",
                   ),
-                  Gaps.v24,
-                  const VideoButton(
-                    text: '2.9m',
-                    icon: FontAwesomeIcons.solidHeart,
+                  child: Text("니꼬"),
+                ),
+                Gaps.v24,
+                const VideoButton(
+                  icon: FontAwesomeIcons.solidHeart,
+                  text: "2.9M",
+                ),
+                Gaps.v24,
+                GestureDetector(
+                  onTap: () => _onCommentsTap(context),
+                  child: const VideoButton(
+                    icon: FontAwesomeIcons.solidComment,
+                    text: "33K",
                   ),
-                  Gaps.v24,
-                  GestureDetector(
-                    onTap: () => _onCommentsTap(context),
-                    child: const VideoButton(
-                      text: '32k',
-                      icon: FontAwesomeIcons.solidComment,
-                    ),
-                  ),
-                  Gaps.v24,
-                  const VideoButton(
-                    text: 'share',
-                    icon: FontAwesomeIcons.share,
-                  ),
-                ],
-              ))
+                ),
+                Gaps.v24,
+                const VideoButton(
+                  icon: FontAwesomeIcons.share,
+                  text: "Share",
+                )
+              ],
+            ),
+          ),
         ],
       ),
     );
